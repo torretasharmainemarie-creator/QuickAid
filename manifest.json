@@ -1,21 +1,27 @@
 {
   "name": "QuickAid",
   "short_name": "QuickAid",
-  "start_url": "./",
-  "scope": "./",
+  "description": "QuickAid is a web based decision support system that guides users in assessing minor wounds and applying basic first aid procedures.",
+  "id": "/quickaid",
+  "start_url": "index.html",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f3fbf6",
+  "orientation": "portrait",
+  "background_color": "#123d2c",
   "theme_color": "#123d2c",
-  "description": "A web based first aid recommendation system for minor wounds with offline support.",
-"icons": [
-  {
-    "src": "quickaid-icon.png",
-    "sizes": "192x192",
-    "type": "image/png"
-  },
-  {
-    "src": "quickaid-icon.png",
-    "sizes": "512x512",
-    "type": "image/png"
-  }
-]
+  "categories": ["health", "medical"],
+  "icons": [
+    {
+      "src": "quickaid-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "quickaid-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
