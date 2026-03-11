@@ -425,6 +425,10 @@
       <input type="checkbox" id="themeToggle" onclick="toggleDarkMode()">
       <span class="slider"></span>
     </label>
+
+    <button id="installBtn" class="secondary-btn" style="display:none;" onclick="installApp()">
+      Install QuickAid
+    </button>
   </div>
 
   <nav class="navbar">
@@ -618,6 +622,41 @@
   </footer>
 
 <script>
+let deferredPrompt = null;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  const installBtn = document.getElementById("installBtn");
+  if (installBtn) {
+    installBtn.style.display = "inline-block";
+  }
+});
+
+async function installApp() {
+  if (!deferredPrompt) {
+    alert("Install option is not available yet on this device or browser.");
+    return;
+  }
+
+  deferredPrompt.prompt();
+  const choiceResult = await deferredPrompt.userChoice;
+
+  if (choiceResult.outcome === "accepted") {
+    document.getElementById("installBtn").style.display = "none";
+  }
+
+  deferredPrompt = null;
+}
+
+window.addEventListener("appinstalled", () => {
+  const installBtn = document.getElementById("installBtn");
+  if (installBtn) {
+    installBtn.style.display = "none";
+  }
+});
+
 function toggleDarkMode() {
   document.body.classList.toggle("dark-mode");
 
