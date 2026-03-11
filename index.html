@@ -1,490 +1,881 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>QuickAid</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#123d2c">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuickAid</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#123d2c">
 
-<style>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
 
-/* YOUR ORIGINAL CSS IS UNCHANGED */
+    html {
+      scroll-behavior: smooth;
+    }
 
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
+    body {
+      background: #f3fbf6;
+      color: #163322;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
 
-html{scroll-behavior:smooth;}
+    .masthead {
+      width: 100%;
+      overflow: hidden;
+      background: linear-gradient(90deg, #132c17, #4d6528, #a1ae1c, #eddb80);
+    }
 
-body{
-background:#f3fbf6;
-color:#163322;
-transition:background .3s ease,color .3s ease;
-}
+    .masthead img {
+      width: 100%;
+      max-height: 500px;
+      object-fit: cover;
+      display: block;
+    }
 
-.masthead{
-width:100%;
-overflow:hidden;
-background:linear-gradient(90deg,#132c17,#4d6528,#a1ae1c,#eddb80);
-}
+    .top-controls {
+      background: #0f2f22;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-.masthead img{
-width:100%;
-max-height:500px;
-object-fit:cover;
-display:block;
-}
+    .toggle-label {
+      color: white;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
 
-.top-controls{
-background:#0f2f22;
-padding:14px 20px;
-display:flex;
-justify-content:center;
-align-items:center;
-gap:12px;
-flex-wrap:wrap;
-}
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 54px;
+      height: 28px;
+    }
 
-.toggle-label{color:white;font-weight:bold;font-size:.95rem;}
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
 
-.switch{position:relative;display:inline-block;width:54px;height:28px;}
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #d8e8de;
+      transition: 0.3s;
+      border-radius: 999px;
+    }
 
-.switch input{opacity:0;width:0;height:0;}
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
 
-.slider{
-position:absolute;
-cursor:pointer;
-inset:0;
-background-color:#d8e8de;
-transition:.3s;
-border-radius:999px;
-}
+    .switch input:checked + .slider {
+      background-color: #2d7a59;
+    }
 
-.slider:before{
-position:absolute;
-content:"";
-height:22px;
-width:22px;
-left:3px;
-bottom:3px;
-background-color:white;
-transition:.3s;
-border-radius:50%;
-}
+    .switch input:checked + .slider:before {
+      transform: translateX(26px);
+    }
 
-.switch input:checked+.slider{background-color:#2d7a59;}
+    .navbar {
+      background: #123d2c;
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      padding: 14px 20px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
 
-.switch input:checked+.slider:before{transform:translateX(26px);}
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.96rem;
+    }
 
-.navbar{
-background:#123d2c;
-display:flex;
-justify-content:center;
-gap:28px;
-padding:14px 20px;
-flex-wrap:wrap;
-position:sticky;
-top:0;
-z-index:50;
-}
+    .navbar a:hover {
+      text-decoration: underline;
+    }
 
-.navbar a{color:white;text-decoration:none;font-weight:bold;font-size:.96rem;}
+    .container {
+      max-width: 1180px;
+      margin: 28px auto;
+      padding: 20px;
+    }
 
-.navbar a:hover{text-decoration:underline;}
+    .hero-grid,
+    .main-grid,
+    .feature-grid {
+      display: grid;
+      gap: 22px;
+    }
 
-.container{max-width:1180px;margin:28px auto;padding:20px;}
+    .hero-grid {
+      grid-template-columns: 1.1fr 0.9fr;
+      margin-bottom: 22px;
+    }
 
-.hero-grid,.main-grid,.feature-grid{display:grid;gap:22px;}
+    .main-grid {
+      grid-template-columns: 1.05fr 0.95fr;
+      margin-bottom: 22px;
+    }
 
-.hero-grid{grid-template-columns:1.1fr .9fr;margin-bottom:22px;}
+    .feature-grid {
+      grid-template-columns: repeat(3, 1fr);
+      margin-bottom: 22px;
+    }
 
-.main-grid{grid-template-columns:1.05fr .95fr;margin-bottom:22px;}
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 26px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
 
-.feature-grid{grid-template-columns:repeat(3,1fr);margin-bottom:22px;}
+    .pill {
+      display: inline-block;
+      background: #dff3e8;
+      color: #123d2c;
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 14px;
+    }
 
-.card{
-background:#fff;
-border-radius:20px;
-padding:26px;
-box-shadow:0 10px 28px rgba(0,0,0,.08);
-transition:background .3s ease,color .3s ease;
-}
+    h2 {
+      color: #123d2c;
+      margin-bottom: 12px;
+    }
 
-.pill{
-display:inline-block;
-background:#dff3e8;
-color:#123d2c;
-padding:7px 14px;
-border-radius:999px;
-font-size:.85rem;
-font-weight:bold;
-margin-bottom:14px;
-}
+    h3 {
+      margin: 18px 0 10px;
+      color: #1b5a41;
+    }
 
-h2{color:#123d2c;margin-bottom:12px;}
+    p, li {
+      line-height: 1.6;
+    }
 
-h3{margin:18px 0 10px;color:#1b5a41;}
+    ul {
+      padding-left: 20px;
+    }
 
-p,li{line-height:1.6;}
+    .feature-card h3 {
+      margin-top: 0;
+    }
 
-ul{padding-left:20px;}
+    label {
+      display: block;
+      margin: 14px 0 8px;
+      font-weight: bold;
+    }
 
-.feature-card h3{margin-top:0;}
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #c8d9cf;
+      font-size: 1rem;
+      background: #ffffff;
+      color: #163322;
+    }
 
-label{display:block;margin:14px 0 8px;font-weight:bold;}
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
 
-select{
-width:100%;
-padding:12px;
-border-radius:10px;
-border:1px solid #c8d9cf;
-font-size:1rem;
-background:#fff;
-color:#163322;
-}
+    .main-btn,
+    .secondary-btn {
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
 
-.btn-row{
-display:grid;
-grid-template-columns:1fr 1fr 1fr;
-gap:10px;
-margin-top:18px;
-}
+    .main-btn {
+      background: linear-gradient(135deg, #123d2c, #1b5a41);
+      color: white;
+    }
 
-.main-btn,.secondary-btn{
-padding:13px;
-border:none;
-border-radius:12px;
-cursor:pointer;
-font-weight:bold;
-font-size:.95rem;
-}
+    .secondary-btn {
+      background: #e7f3ec;
+      color: #123d2c;
+    }
 
-.main-btn{
-background:linear-gradient(135deg,#123d2c,#1b5a41);
-color:white;
-}
+    .score-box {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #eef8f2;
+      border-left: 5px solid #1b5a41;
+    }
 
-.secondary-btn{
-background:#e7f3ec;
-color:#123d2c;
-}
+    .result {
+      display: none;
+      margin-top: 18px;
+      padding: 20px;
+      border-radius: 16px;
+      background: #eef8f2;
+      border-left: 6px solid #1b5a41;
+    }
 
-.score-box{
-margin-top:16px;
-padding:14px;
-border-radius:14px;
-background:#eef8f2;
-border-left:5px solid #1b5a41;
-}
+    .priority {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
 
-.result{
-display:none;
-margin-top:18px;
-padding:20px;
-border-radius:16px;
-background:#eef8f2;
-border-left:6px solid #1b5a41;
-}
+    .low {
+      background: #dff3e8;
+      color: #1b5a41;
+    }
 
-.priority{
-display:inline-block;
-padding:8px 14px;
-border-radius:999px;
-font-weight:bold;
-margin-bottom:12px;
-}
+    .medium {
+      background: #fff3cd;
+      color: #7a5a00;
+    }
 
-.low{background:#dff3e8;color:#1b5a41;}
+    .high {
+      background: #fde2e2;
+      color: #8b1e1e;
+    }
 
-.medium{background:#fff3cd;color:#7a5a00;}
+    .warning {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #fff7d8;
+      border-left: 5px solid #e0b400;
+      color: #6b5700;
+    }
 
-.high{background:#fde2e2;color:#8b1e1e;}
+    .danger-box {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #fde7e7;
+      border-left: 5px solid #d9534f;
+      color: #7a1f1f;
+    }
 
-.warning{
-margin-top:18px;
-padding:14px;
-border-radius:14px;
-background:#fff7d8;
-border-left:5px solid #e0b400;
-color:#6b5700;
-}
+    .checklist {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
 
-.danger-box{
-margin-top:16px;
-padding:14px;
-border-radius:14px;
-background:#fde7e7;
-border-left:5px solid #d9534f;
-color:#7a1f1f;
-}
+    .check-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: #f7fcf9;
+      border: 1px solid #dcebe2;
+      padding: 12px;
+      border-radius: 12px;
+    }
 
-.checklist{display:grid;gap:10px;margin-top:12px;}
+    .check-item input {
+      margin-top: 3px;
+      transform: scale(1.1);
+    }
 
-.check-item{
-display:flex;
-gap:10px;
-align-items:flex-start;
-background:#f7fcf9;
-border:1px solid #dcebe2;
-padding:12px;
-border-radius:12px;
-}
+    .mini-note {
+      font-size: 0.93rem;
+      color: #4b6758;
+    }
 
-.check-item input{margin-top:3px;transform:scale(1.1);}
+    .references-list li {
+      margin-bottom: 10px;
+    }
 
-.mini-note{font-size:.93rem;color:#4b6758;}
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #476355;
+      font-size: 0.95rem;
+    }
 
-.references-list li{margin-bottom:10px;}
+    body.dark-mode {
+      background: #0f1412;
+      color: #edf7f0;
+    }
 
-footer{text-align:center;padding:24px;color:#476355;font-size:.95rem;}
+    body.dark-mode .masthead {
+      background: #03100a;
+    }
 
-body.dark-mode{background:#0f1412;color:#edf7f0;}
+    body.dark-mode .top-controls,
+    body.dark-mode .navbar {
+      background: #081c15;
+    }
 
-body.dark-mode .top-controls,
-body.dark-mode .navbar{background:#081c15;}
+    body.dark-mode .card {
+      background: #18211c;
+      color: #edf7f0;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+    }
 
-body.dark-mode .card{background:#18211c;color:#edf7f0;}
+    body.dark-mode .pill {
+      background: #214333;
+      color: #dff3e8;
+    }
 
-@media(max-width:980px){
-.hero-grid,.main-grid,.feature-grid{grid-template-columns:1fr;}
-.btn-row{grid-template-columns:1fr;}
-}
+    body.dark-mode h2,
+    body.dark-mode h3 {
+      color: #dff3e8;
+    }
 
-</style>
+    body.dark-mode select {
+      background: #24302a;
+      color: #ffffff;
+      border: 1px solid #3a4a42;
+    }
+
+    body.dark-mode .main-btn {
+      background: linear-gradient(135deg, #1b5a41, #2d7a59);
+      color: white;
+    }
+
+    body.dark-mode .secondary-btn {
+      background: #24352d;
+      color: #e7fff0;
+    }
+
+    body.dark-mode .result,
+    body.dark-mode .score-box {
+      background: #1f2a24;
+      color: #edf7f0;
+      border-left-color: #4da97c;
+    }
+
+    body.dark-mode .warning {
+      background: #3a3316;
+      color: #ffeaa0;
+      border-left-color: #d8b11e;
+    }
+
+    body.dark-mode .danger-box {
+      background: #3a2020;
+      color: #ffb9b9;
+      border-left-color: #d9534f;
+    }
+
+    body.dark-mode .check-item {
+      background: #1f2a24;
+      border-color: #31443b;
+    }
+
+    body.dark-mode .mini-note,
+    body.dark-mode footer {
+      color: #b7cbbd;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .main-grid,
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .btn-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <header id="home" class="masthead">
+    <img src="masthead.png" alt="QuickAid Masthead">
+  </header>
 
-<header id="home" class="masthead">
-<img src="masthead.png" alt="QuickAid Masthead">
-</header>
+  <div class="top-controls">
+    <span class="toggle-label">Light / Dark Mode</span>
+    <label class="switch">
+      <input type="checkbox" id="themeToggle" onclick="toggleDarkMode()">
+      <span class="slider"></span>
+    </label>
+  </div>
 
-<div class="top-controls">
-<span class="toggle-label">Light / Dark Mode</span>
-<label class="switch">
-<input type="checkbox" id="themeToggle" onclick="toggleDarkMode()">
-<span class="slider"></span>
-</label>
-</div>
+  <nav class="navbar">
+    <a href="#home">Home</a>
+    <a href="#features">Features</a>
+    <a href="#assessment">Assessment</a>
+    <a href="#about">About</a>
+    <a href="#references">References</a>
+  </nav>
 
-<nav class="navbar">
-<a href="#home">Home</a>
-<a href="#features">Features</a>
-<a href="#assessment">Assessment</a>
-<a href="#about">About</a>
-<a href="#references">References</a>
-</nav>
+  <div class="container">
+    <div class="hero-grid">
+      <div class="card">
+        <div class="pill">System Overview</div>
+        <h2>How QuickAid Works</h2>
+        <p>
+          QuickAid is a prototype decision-support website for minor wound care.
+          Instead of requiring users to search through multiple online sources,
+          the system organizes essential first aid guidance into one guided and accessible interface.
+        </p>
+        <h3>System Flow</h3>
+        <ul>
+          <li>User selects the wound type and visible wound condition</li>
+          <li>User checks symptoms or warning signs observed on the wound</li>
+          <li>The system calculates a simple risk score and assigns a priority level</li>
+          <li>The system generates basic first aid guidance and optional natural support</li>
+          <li>User may download the generated recommendation report for reference</li>
+        </ul>
+      </div>
 
-<div class="container">
+      <div class="card">
+        <div class="pill">Innovation Value</div>
+        <h2>Why QuickAid Is More Than a Basic Information Website</h2>
+        <ul>
+          <li>It uses structured wound assessment instead of static content display</li>
+          <li>It includes a symptom checklist to screen possible warning signs</li>
+          <li>It generates a risk score automatically based on user input</li>
+          <li>It classifies cases into low, moderate, or high priority</li>
+          <li>It provides downloadable output for user reference</li>
+          <li>It supports offline access after the initial online visit</li>
+          <li>It includes a dark mode option for accessibility and user comfort</li>
+        </ul>
+      </div>
+    </div>
 
-<!-- YOUR ORIGINAL CONTENT REMAINS EXACTLY THE SAME -->
+    <section id="features" class="feature-grid">
+      <div class="card feature-card">
+        <div class="pill">Feature 1</div>
+        <h3>Symptom Checklist</h3>
+        <p>
+          Users can select visible warning signs such as swelling, discharge, redness,
+          fever, unusual pain, or spreading irritation.
+        </p>
+      </div>
 
-<div class="main-grid">
+      <div class="card feature-card">
+        <div class="pill">Feature 2</div>
+        <h3>Auto Risk Score</h3>
+        <p>
+          QuickAid computes a simple risk score based on wound severity,
+          bleeding level, and selected symptoms.
+        </p>
+      </div>
 
-<section id="assessment" class="card">
+      <div class="card feature-card">
+        <div class="pill">Feature 3</div>
+        <h3>Offline Access</h3>
+        <p>
+          After the website is opened once with internet access, essential files may be stored
+          by the browser so that the system can still be accessed later without connection.
+        </p>
+      </div>
+    </section>
 
-<div class="pill">Assessment Form</div>
-<h2>Minor Wound Evaluation</h2>
+    <div class="main-grid">
+      <section id="assessment" class="card">
+        <div class="pill">Assessment Form</div>
+        <h2>Minor Wound Evaluation</h2>
+        <p>Complete the fields below to generate a structured recommendation.</p>
 
-<label for="injuryType">Type of wound</label>
-<select id="injuryType">
-<option value="">Select wound type</option>
-<option value="cut">Minor Cut</option>
-<option value="burn">Minor Burn</option>
-<option value="bite">Insect Bite</option>
-<option value="abrasion">Abrasion / Scrape</option>
-</select>
+        <label for="injuryType">Type of wound</label>
+        <select id="injuryType">
+          <option value="">Select wound type</option>
+          <option value="cut">Minor Cut</option>
+          <option value="burn">Minor Burn</option>
+          <option value="bite">Insect Bite</option>
+          <option value="abrasion">Abrasion / Scrape</option>
+        </select>
 
-<label for="severity">Observed condition</label>
-<select id="severity">
-<option value="">Select condition</option>
-<option value="mild">Mild</option>
-<option value="moderate">Moderate</option>
-<option value="serious">Looks serious</option>
-</select>
+        <label for="severity">Observed condition</label>
+        <select id="severity">
+          <option value="">Select condition</option>
+          <option value="mild">Mild</option>
+          <option value="moderate">Moderate</option>
+          <option value="serious">Looks serious</option>
+        </select>
 
-<label for="bleeding">Is there active bleeding?</label>
-<select id="bleeding">
-<option value="">Select answer</option>
-<option value="no">No</option>
-<option value="mild">Yes, mild</option>
-<option value="heavy">Yes, heavy</option>
-</select>
+        <label for="bleeding">Is there active bleeding?</label>
+        <select id="bleeding">
+          <option value="">Select answer</option>
+          <option value="no">No</option>
+          <option value="mild">Yes, mild</option>
+          <option value="heavy">Yes, heavy</option>
+        </select>
 
-<label for="herbalAvailable">Are natural remedies available?</label>
-<select id="herbalAvailable">
-<option value="">Select answer</option>
-<option value="yes">Yes</option>
-<option value="no">No</option>
-</select>
+        <label for="herbalAvailable">Are natural remedies available?</label>
+        <select id="herbalAvailable">
+          <option value="">Select answer</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
 
-<h3>Symptom Checklist</h3>
+        <h3>Symptom Checklist</h3>
+        <p class="mini-note">Select all signs that are present.</p>
 
-<div class="checklist">
-<label class="check-item"><input type="checkbox" class="symptom" value="redness"> Severe redness</label>
-<label class="check-item"><input type="checkbox" class="symptom" value="swelling"> Swelling</label>
-<label class="check-item"><input type="checkbox" class="symptom" value="pus"> Pus or discharge</label>
-<label class="check-item"><input type="checkbox" class="symptom" value="pain"> Unusual pain</label>
-<label class="check-item"><input type="checkbox" class="symptom" value="fever"> Fever</label>
-<label class="check-item"><input type="checkbox" class="symptom" value="spreading"> Spreading irritation</label>
-</div>
+        <div class="checklist">
+          <label class="check-item"><input type="checkbox" class="symptom" value="redness"> Severe redness</label>
+          <label class="check-item"><input type="checkbox" class="symptom" value="swelling"> Swelling</label>
+          <label class="check-item"><input type="checkbox" class="symptom" value="pus"> Pus or discharge</label>
+          <label class="check-item"><input type="checkbox" class="symptom" value="pain"> Unusual pain</label>
+          <label class="check-item"><input type="checkbox" class="symptom" value="fever"> Fever</label>
+          <label class="check-item"><input type="checkbox" class="symptom" value="spreading"> Spreading irritation</label>
+        </div>
 
-<div class="btn-row">
-<button class="main-btn" onclick="generateQuickAid()">Generate Recommendation</button>
-<button class="secondary-btn" onclick="resetAssessment()">Start New Assessment</button>
-<button class="secondary-btn" onclick="downloadReport()">Download Report</button>
-</div>
+        <div class="btn-row">
+          <button class="main-btn" onclick="generateQuickAidV2()">Generate Recommendation</button>
+          <button class="secondary-btn" onclick="resetAssessment()">Start New Assessment</button>
+          <button class="secondary-btn" onclick="downloadReport()">Download Report</button>
+        </div>
+      </section>
 
-</section>
+      <section class="card">
+        <div class="pill">Generated Output</div>
+        <h2>Recommendation Panel</h2>
+        <p>
+          The system evaluates the entered data and produces a priority level,
+          a risk score, first aid actions, optional natural support, and medical caution notes.
+        </p>
 
-<section class="card">
+        <div id="scoreBox" class="score-box">
+          <strong>Risk Score:</strong> Not generated yet
+        </div>
 
-<div class="pill">Generated Output</div>
+        <div id="result" class="result"></div>
 
-<div id="scoreBox" class="score-box">
-<strong>Risk Score:</strong> Not generated yet
-</div>
+        <div id="hospitalBox" style="display:none; margin-top:15px;">
+          <button class="main-btn" onclick="findNearestHospital()">Find Nearby Hospitals</button>
+        </div>
 
-<div id="result" class="result"></div>
+        <div class="warning">
+          <strong>Disclaimer:</strong> QuickAid is intended for educational purposes only.
+          It does not replace professional medical advice, diagnosis, or treatment.
+        </div>
+      </section>
+    </div>
 
-<div id="hospitalBox" style="display:none;margin-top:15px;">
-<button class="main-btn" onclick="findHospital()">Find Nearby Hospitals</button>
-</div>
+    <section id="about" class="card">
+      <div class="pill">About the Study</div>
+      <h2>About QuickAid</h2>
+      <p>
+        QuickAid was developed as an educational prototype that organizes first aid
+        responses for minor wounds into one accessible web-based platform.
+        The system focuses on minor wound assessment, structured guidance,
+        optional natural support, and early identification of visible warning signs.
+      </p>
+    </section>
 
-</section>
+    <section id="references" class="card" style="margin-top:22px;">
+      <div class="pill">Knowledge Base</div>
+      <h2>Information Sources and Basis of Recommendations</h2>
+      <p class="mini-note">
+        The recommendations presented by QuickAid are based on general first aid concepts,
+        educational health references, and published discussions on minor wound care and basic natural support.
+        This section demonstrates the informational basis used in organizing the system’s guidance.
+      </p>
+      <ul class="references-list">
+        <li>General first aid principles on cleaning, protecting, and observing minor wounds</li>
+        <li>Educational health resources discussing minor cuts, burns, insect bites, and abrasions</li>
+        <li>Published discussions on the use of aloe vera and similar natural substances as supportive care for minor skin irritation</li>
+        <li>Public health and school safety materials related to wound observation and safety precautions</li>
+      </ul>
+    </section>
+  </div>
 
-</div>
-</div>
-
-<footer>
-QuickAid © 2026 | Prototype Web Based First Aid Recommendation System
-</footer>
+  <footer>
+    QuickAid © 2026 | Prototype Web Based First Aid Recommendation System
+  </footer>
 
 <script>
+function toggleDarkMode() {
+  document.body.classList.toggle("dark-mode");
 
-/* DARK MODE */
+  const themeToggle = document.getElementById("themeToggle");
 
-function toggleDarkMode(){
-document.body.classList.toggle("dark-mode");
-localStorage.setItem("theme",document.body.classList.contains("dark-mode"));
+  if (document.body.classList.contains("dark-mode")) {
+    localStorage.setItem("theme", "dark");
+    if (themeToggle) themeToggle.checked = true;
+  } else {
+    localStorage.setItem("theme", "light");
+    if (themeToggle) themeToggle.checked = false;
+  }
 }
 
-window.onload=function(){
-if(localStorage.getItem("theme")==="true"){
-document.body.classList.add("dark-mode");
-document.getElementById("themeToggle").checked=true;
-}
-}
+window.onload = function () {
+  const savedTheme = localStorage.getItem("theme");
+  const themeToggle = document.getElementById("themeToggle");
 
-/* RESET */
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark-mode");
+    if (themeToggle) themeToggle.checked = true;
+  }
+};
 
-function resetAssessment(){
-document.querySelectorAll("select").forEach(e=>e.value="");
-document.querySelectorAll(".symptom").forEach(e=>e.checked=false);
-document.getElementById("result").style.display="none";
-document.getElementById("hospitalBox").style.display="none";
-document.getElementById("scoreBox").innerHTML="<strong>Risk Score:</strong> Not generated yet";
-}
+function resetAssessment() {
+  document.getElementById("injuryType").value = "";
+  document.getElementById("severity").value = "";
+  document.getElementById("bleeding").value = "";
+  document.getElementById("herbalAvailable").value = "";
 
-/* DOWNLOAD */
+  document.querySelectorAll(".symptom").forEach(symptom => {
+    symptom.checked = false;
+  });
 
-function downloadReport(){
-let text=document.getElementById("result").innerText;
-
-if(!text){
-alert("Generate a recommendation first.");
-return;
-}
-
-let blob=new Blob([text],{type:"text/plain"});
-let a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
-a.download="QuickAid_Report.txt";
-a.click();
+  document.getElementById("scoreBox").innerHTML = "<strong>Risk Score:</strong> Not generated yet";
+  document.getElementById("result").style.display = "none";
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("hospitalBox").style.display = "none";
 }
 
-/* HOSPITAL */
+function downloadReport() {
+  const scoreText = document.getElementById("scoreBox").innerText;
+  const resultText = document.getElementById("result").innerText;
 
-function findHospital(){
+  if (resultText.trim() === "") {
+    alert("Please generate a recommendation first before downloading the report.");
+    return;
+  }
 
-navigator.geolocation.getCurrentPosition(function(pos){
+  const content = `QuickAid Report
 
-let lat=pos.coords.latitude;
-let lon=pos.coords.longitude;
+${scoreText}
 
-window.open(`https://www.google.com/maps/search/hospital/@${lat},${lon},15z`);
-
-});
-}
-
-/* MAIN SYSTEM */
-
-function generateQuickAid(){
-
-let severity=document.getElementById("severity").value;
-let bleeding=document.getElementById("bleeding").value;
-let result=document.getElementById("result");
-let hospitalBox=document.getElementById("hospitalBox");
-let score=0;
-
-/* SEVERITY */
-
-if(severity==="mild")score+=1;
-if(severity==="moderate")score+=3;
-if(severity==="serious")score+=5;
-
-/* BLEEDING */
-
-if(bleeding==="mild")score+=2;
-if(bleeding==="heavy")score+=4;
-
-/* SYMPTOMS */
-
-document.querySelectorAll(".symptom:checked").forEach(symptom=>{
-
-if(symptom.value==="fever"||symptom.value==="pus"||symptom.value==="spreading")
-score+=2;
-else
-score+=1;
-
-});
-
-/* MAX LIMIT */
-
-if(score>10)score=10;
-
-/* PRIORITY */
-
-let priority="Low Priority";
-let className="low";
-
-if(score>=7){priority="High Priority";className="high";}
-else if(score>=4){priority="Moderate Priority";className="medium";}
-
-document.getElementById("scoreBox").innerHTML=`<strong>Risk Score:</strong> ${score} / 10`;
-
-result.innerHTML=`
-<div class="priority ${className}">${priority}</div>
-<p><strong>Follow basic wound cleaning and monitoring procedures.</strong></p>
+${resultText}
 `;
 
-result.style.display="block";
-
-if(priority==="High Priority"){
-hospitalBox.style.display="block";
-
-result.innerHTML+=`
-<div class="danger-box">
-This case appears serious. Seek professional medical attention immediately.
-</div>
-`;
-
-}else{
-hospitalBox.style.display="none";
+  const blob = new Blob([content], { type: "text/plain" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "QuickAid_Report.txt";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
+function findNearestHospital() {
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by your browser.");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const mapsURL = `https://www.google.com/maps/search/hospital/@${lat},${lon},15z`;
+      window.open(mapsURL, "_blank");
+    },
+    function() {
+      alert("Unable to get your location. Please allow location access.");
+    }
+  );
 }
 
+function generateQuickAidV2() {
+  const injuryType = document.getElementById("injuryType").value;
+  const severity = document.getElementById("severity").value;
+  const bleeding = document.getElementById("bleeding").value;
+  const herbalAvailable = document.getElementById("herbalAvailable").value;
+  const result = document.getElementById("result");
+  const scoreBox = document.getElementById("scoreBox");
+  const hospitalBox = document.getElementById("hospitalBox");
+
+  if (!injuryType || !severity || !bleeding || !herbalAvailable) {
+    result.style.display = "block";
+    result.innerHTML = "<h3>Please complete all required fields first.</h3>";
+    hospitalBox.style.display = "none";
+    scoreBox.innerHTML = "<strong>Risk Score:</strong> Not generated yet";
+    return;
+  }
+
+  let woundName = "";
+  let firstAidSteps = "";
+  let naturalSupport = "";
+
+  if (injuryType === "cut") {
+    woundName = "Minor Cut";
+    firstAidSteps = `
+      <h3>Basic First Aid for Minor Cut</h3>
+      <ul>
+        <li>Wash hands before touching the wound if possible.</li>
+        <li>Clean the cut gently with clean running water.</li>
+        <li>Apply gentle pressure if slight bleeding is present.</li>
+        <li>Cover with a clean dressing or bandage.</li>
+      </ul>
+    `;
+
+    naturalSupport = herbalAvailable === "yes"
+      ? `
+        <h3>Complementary Natural Support</h3>
+        <ul>
+          <li><strong>Honey</strong> – may help protect the wound because of its natural antibacterial properties.</li>
+          <li><strong>Turmeric paste</strong> – may provide anti inflammatory support for minor surface wounds.</li>
+          <li><strong>Banana peel extract</strong> – may contain antioxidant and antimicrobial compounds.</li>
+        </ul>
+      `
+      : `<p><strong>Complementary Natural Support:</strong> No natural remedy selected. Continue proper cleaning and dressing.</p>`;
+  }
+
+  else if (injuryType === "burn") {
+    woundName = "Minor Burn";
+    firstAidSteps = `
+      <h3>Basic First Aid for Minor Burn</h3>
+      <ul>
+        <li>Cool the area under running water for at least 10 minutes.</li>
+        <li>Do not apply ice directly to the skin.</li>
+        <li>Remove tight items near the area if safe to do so.</li>
+        <li>Cover loosely with a clean non stick dressing if needed.</li>
+      </ul>
+    `;
+
+    naturalSupport = herbalAvailable === "yes"
+      ? `
+        <h3>Complementary Natural Support</h3>
+        <ul>
+          <li><strong>Aloe vera</strong> – may help soothe the skin and reduce irritation after cooling.</li>
+          <li><strong>Honey</strong> – may help protect the area from infection in minor burns.</li>
+          <li><strong>Cucumber gel</strong> – may provide a cooling and soothing effect for mild burns.</li>
+        </ul>
+      `
+      : `<p><strong>Complementary Natural Support:</strong> No natural remedy selected. Focus on proper cooling and protection of the burn area.</p>`;
+  }
+
+  else if (injuryType === "bite") {
+    woundName = "Insect Bite";
+    firstAidSteps = `
+      <h3>Basic First Aid for Insect Bite</h3>
+      <ul>
+        <li>Wash the area with mild soap and clean water.</li>
+        <li>Apply a cold compress to reduce swelling or irritation.</li>
+        <li>Avoid scratching the area.</li>
+        <li>Observe for unusual swelling or allergic reaction.</li>
+      </ul>
+    `;
+
+    naturalSupport = herbalAvailable === "yes"
+      ? `
+        <h3>Complementary Natural Support</h3>
+        <ul>
+          <li><strong>Basil leaf extract</strong> – may help reduce itching and inflammation.</li>
+          <li><strong>Oatmeal paste</strong> – may soothe irritation and itching.</li>
+          <li><strong>Diluted tea tree oil</strong> – may provide antiseptic support if used carefully on minor skin irritation.</li>
+        </ul>
+      `
+      : `<p><strong>Complementary Natural Support:</strong> No natural remedy selected. Continue observation and basic skin care.</p>`;
+  }
+
+  else if (injuryType === "abrasion") {
+    woundName = "Abrasion / Scrape";
+    firstAidSteps = `
+      <h3>Basic First Aid for Abrasion / Scrape</h3>
+      <ul>
+        <li>Rinse the scrape gently with clean water to remove dirt.</li>
+        <li>Pat dry using a clean cloth or tissue.</li>
+        <li>Protect the area with a clean dressing if needed.</li>
+        <li>Keep the wound clean during recovery.</li>
+      </ul>
+    `;
+
+    naturalSupport = herbalAvailable === "yes"
+      ? `
+        <h3>Complementary Natural Support</h3>
+        <ul>
+          <li><strong>Aloe vera</strong> – may help soothe irritated skin and support repair.</li>
+          <li><strong>Coconut oil</strong> – may provide mild antimicrobial support for superficial scrapes.</li>
+          <li><strong>Plantain leaf extract</strong> – traditionally used for minor skin irritation and inflammation.</li>
+        </ul>
+      `
+      : `<p><strong>Complementary Natural Support:</strong> No natural remedy selected. Continue wound cleaning and protection without natural remedies.</p>`;
+  }
+
+  let score = 0;
+
+  if (severity === "mild") score += 1;
+  if (severity === "moderate") score += 3;
+  if (severity === "serious") score += 4;
+
+  if (bleeding === "mild") score += 1;
+  if (bleeding === "heavy") score += 3;
+
+  const checkedSymptoms = document.querySelectorAll(".symptom:checked");
+
+  checkedSymptoms.forEach(symptom => {
+    if (symptom.value === "fever" || symptom.value === "pus" || symptom.value === "spreading") {
+      score += 1.5;
+    } else {
+      score += 0.5;
+    }
+  });
+
+  if (score > 10) {
+    score = 10;
+  }
+
+  let priority = "Low Priority";
+  let priorityClass = "low";
+
+  if (score >= 7) {
+    priority = "High Priority";
+    priorityClass = "high";
+  } else if (score >= 4) {
+    priority = "Moderate Priority";
+    priorityClass = "medium";
+  }
+
+  scoreBox.innerHTML = `
+    <strong>Risk Score:</strong> ${score.toFixed(1)} / 10
+  `;
+
+  result.innerHTML = `
+    <div class="priority ${priorityClass}">${priority}</div>
+    <p><strong>Wound Type:</strong> ${woundName}</p>
+    ${firstAidSteps}
+    ${naturalSupport}
+    <div class="warning">
+      <strong>Reminder:</strong> Natural remedies are optional supportive care only for minor wounds. Seek medical attention if symptoms worsen or the wound appears serious.
+    </div>
+  `;
+
+  if (priority === "High Priority") {
+    hospitalBox.style.display = "block";
+    result.innerHTML += `
+      <div class="danger-box">
+        <strong>Medical Alert:</strong> This case is marked as high priority. Consider seeking immediate medical attention and locating the nearest hospital.
+      </div>
+    `;
+  } else {
+    hospitalBox.style.display = "none";
+  }
+
+  result.style.display = "block";
+}
 </script>
-
 </body>
 </html>
