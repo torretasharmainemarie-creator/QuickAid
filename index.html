@@ -571,7 +571,11 @@
         <div id="result" class="result"></div>
 
         <div id="hospitalBox" style="display:none; margin-top:15px;">
-          <button class="main-btn" onclick="findNearestHospital()">Find Nearby Hospitals</button>
+          <button id="hospitalBtn" class="main-btn" onclick="findNearestHospital()">Find Nearby Hospitals</button>
+
+          <div id="offlineHelp" class="danger-box" style="display:none; margin-top:12px;">
+            <strong>Offline Emergency Advice:</strong> Internet is unavailable. Please proceed to the nearest known hospital, clinic, barangay health center, or ask nearby adults, responders, guards, teachers, or staff for immediate assistance.
+          </div>
         </div>
 
         <div class="warning">
@@ -636,7 +640,28 @@ window.onload = function () {
     document.body.classList.add("dark-mode");
     if (themeToggle) themeToggle.checked = true;
   }
+
+  updateHospitalAccess();
 };
+
+window.addEventListener("online", updateHospitalAccess);
+window.addEventListener("offline", updateHospitalAccess);
+
+function updateHospitalAccess() {
+  const hospitalBtn = document.getElementById("hospitalBtn");
+  const offlineHelp = document.getElementById("offlineHelp");
+  const hospitalBox = document.getElementById("hospitalBox");
+
+  if (!hospitalBox || hospitalBox.style.display === "none") return;
+
+  if (navigator.onLine) {
+    hospitalBtn.style.display = "block";
+    offlineHelp.style.display = "none";
+  } else {
+    hospitalBtn.style.display = "none";
+    offlineHelp.style.display = "block";
+  }
+}
 
 function resetAssessment() {
   document.getElementById("injuryType").value = "";
@@ -652,6 +677,8 @@ function resetAssessment() {
   document.getElementById("result").style.display = "none";
   document.getElementById("result").innerHTML = "";
   document.getElementById("hospitalBox").style.display = "none";
+  document.getElementById("hospitalBtn").style.display = "block";
+  document.getElementById("offlineHelp").style.display = "none";
 }
 
 function downloadReport() {
@@ -680,6 +707,12 @@ ${resultText}
 }
 
 function findNearestHospital() {
+  if (!navigator.onLine) {
+    updateHospitalAccess();
+    alert("Internet is unavailable. Please follow the offline emergency advice shown on the page.");
+    return;
+  }
+
   if (!navigator.geolocation) {
     alert("Geolocation is not supported by your browser.");
     return;
@@ -865,9 +898,11 @@ function generateQuickAidV2() {
 
   if (priority === "High Priority") {
     hospitalBox.style.display = "block";
+    updateHospitalAccess();
+
     result.innerHTML += `
       <div class="danger-box">
-        <strong>Medical Alert:</strong> This case is marked as high priority. Consider seeking immediate medical attention and locating the nearest hospital.
+        <strong>Medical Alert:</strong> This case is marked as high priority. Consider seeking immediate medical attention. If internet is available, you may locate the nearest hospital. If internet is unavailable, proceed to the nearest known hospital, clinic, or barangay health center and ask nearby adults or responders for help.
       </div>
     `;
   } else {
